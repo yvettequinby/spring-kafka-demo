@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Spring Kafka Demo</title>
+</head>
+<body>
+<h2>
+    Spring Kafka Demo
+</h2>
+<p>
+    This is a simple project to demo Spring, Kafka and Docker.
+</p>
+<p>
+    Use the form below to send data to the server.
+    The controller will then put a message on a Kafka topic.
+    A listener has been configured to listen to the topic.
+    The message will be logged when it is received.
+</p>
+<p>
+    <form th:object="${dto}" th:action="''" method="post">
+
+        <div th:if="${#fields.hasErrors('*')}">
+            <p style="color:red" th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>
+        </div>
+        <p style="color: blue" th:if="${not #strings.isEmpty(infoMessage)}" th:text="${infoMessage}">
+            My message
+        </p>
+        <table>
+            <tr>
+                <td>
+                    Title
+                </td>
+                <td>
+                    <input th:field="*{title}" name="title" minlength="1" maxlength="20" type="text" required />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Message
+                </td>
+                <td>
+                    <input th:field="*{message}" name="message" minlength="1" maxlength="100" type="text" required />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    &nbsp;
+                </td>
+                <td>
+                    <button type="submit" name="action" value="save">Send</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+</body>
+</html>
