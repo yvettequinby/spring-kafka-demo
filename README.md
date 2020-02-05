@@ -29,3 +29,10 @@ You can then open the following address in a web browser:
 http://localhost:8080/spring-kafka-demo/
 
 and follow the instructions.
+
+## Key Demos
+- Spring Kafka configuration in application.yaml
+- Kafka topic creation with Spring @Configuration
+- Publishing Kafka messages to a topic with Spring KafkaTemplate
+- Listening to Kafka messages with Spring @KafkaListener
+- Kafka Testing (WIP) with Spring @EmbeddedKafka
