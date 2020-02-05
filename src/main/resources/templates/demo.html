@@ -18,6 +18,10 @@
     The message will be logged when it is received.
 </p>
 <p>
+    Use the title "error" to force an error in the listener.
+    This will trigger a demo of the error handler, which will retry 10 times to process the message.
+</p>
+<p>
     <form th:object="${dto}" th:action="''" method="post">
 
         <div th:if="${#fields.hasErrors('*')}">
