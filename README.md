@@ -11,9 +11,9 @@ When you submit the form, the MVC controller receives the data and publishes the
 A Spring Kafka listener then receives the DTO and logs a message.
 
 ## Requirements
-Docker
-Java 11
-Maven
+- Docker
+- Java 11
+- Maven
 
 ## Run
 Kafka is run in a docker container. To run the docker container, execute the following command:
