@@ -20,6 +20,7 @@
 <p>
     Use the title "error" to force an error in the listener.
     This will trigger a demo of the error handler, which will retry 10 times to process the message.
+    After 10 times, the message is passed to the Dead Letter Topic (DLT)
 </p>
 <p>
     <form th:object="${dto}" th:action="''" method="post">
