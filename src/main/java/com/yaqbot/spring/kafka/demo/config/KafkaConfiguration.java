@@ -2,6 +2,7 @@ package com.yaqbot.spring.kafka.demo.config;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,12 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.SeekToCurrentErrorHandler;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.policy.AlwaysRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.util.backoff.FixedBackOff;
+
+import java.util.Objects;
 
 @Configuration
 @RequiredArgsConstructor
@@ -42,14 +49,28 @@ public class KafkaConfiguration {
   }
 
   @Bean
-  public ConcurrentKafkaListenerContainerFactory kafkaListenerContainerFactory() {
-    ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+  public ConcurrentKafkaListenerContainerFactory<Object, Object> kafkaListenerContainerFactory() {
+    final DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate);
+    final ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+    backOffPolicy.setInitialInterval(1000);
+    backOffPolicy.setMultiplier(1.5);
+    final RetryTemplate retryTemplate = new RetryTemplate();
+    retryTemplate.setRetryPolicy(new AlwaysRetryPolicy());
+    retryTemplate.setBackOffPolicy(backOffPolicy);
+    final ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
     kafkaListenerContainerFactoryConfigurer.configure(factory, kafkaConsumerFactory);
-    factory.setErrorHandler(
-            new SeekToCurrentErrorHandler( // will retry 10 times
-                    new DeadLetterPublishingRecoverer(kafkaTemplate))); // final failure: send to dead letter topic (DLT)
+    factory.setErrorHandler(new SeekToCurrentErrorHandler(new FixedBackOff(0L, 5L)));
+    factory.setRetryTemplate(retryTemplate);
+    factory.setStatefulRetry(true);
+    factory.setRecoveryCallback(context -> {
+      recoverer.accept((ConsumerRecord<?, ?>) Objects.requireNonNull(context.getAttribute("record")),
+              (Exception) context.getLastThrowable());
+      return null;
+    });
     return factory;
   }
+
+
 
 
 }

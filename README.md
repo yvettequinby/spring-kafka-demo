@@ -36,4 +36,4 @@ and follow the instructions.
 - Publishing Kafka messages to a topic with Spring KafkaTemplate
 - Listening to Kafka messages with Spring @KafkaListener
 - Kafka Testing (WIP) with Spring @EmbeddedKafka
-- Spring Kafka listener error handling with SeekToCurrentErrorHandler and DeadLetterPublishingRecoverer
+- Spring Kafka listener error handling with ExponentialBackOffPolicy, SeekToCurrentErrorHandler and DeadLetterPublishingRecoverer
